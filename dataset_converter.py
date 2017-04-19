@@ -21,6 +21,7 @@ mypath = sys.argv[1]
 out = sys.argv[2]
 
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+onlyfiles.sort(key=lambda f: int(filter(str.isdigit, f)))
 
 logging.info('Convert images at %s to %s' % (mypath, out))
 datas = []

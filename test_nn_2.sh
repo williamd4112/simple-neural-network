@@ -1,7 +1,7 @@
 D=2
 MODEL="nn"
-LOAD="model/nn"
-ARCHI="--h 2 --h_d 128,128 --activations relu,relu"
+LOAD="model/nn_2"
+ARCHI="--h 1 --h_d 128 --activations sigmoid"
 OUTPUT=$1
 
 if [ -z "$2" ]

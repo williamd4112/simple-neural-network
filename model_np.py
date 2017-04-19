@@ -72,7 +72,7 @@ class ClassificationModel(object):
 
 class LinearClassificationModel(ClassificationModel):
     def __init__(self, optimizer, epochs=None, batch_size=None, tolerance=None):
-        super(ClassificationModel, self).__init__(optimizer, epochs, batch_size, tolerance)
+        super(LinearClassificationModel, self).__init__(optimizer, epochs, batch_size, tolerance)
         self.w = None
 
     def save(self, path):

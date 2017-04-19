@@ -129,7 +129,7 @@ def plot(args):
         X_phi = np.hstack((bias, X))
         y = model.test(sess, X_phi)
         return y.argmax(axis=1)
-    plot_decision_boundary(func, x_phi, t_, x_phi[:, 0].min(), x_phi[:, 1].min(), x_phi[:, 0].max(), x_phi[:, 1].max(), 0.1) 
+    plot_decision_boundary(func, x_phi, t_, x_phi[:, 0].min(), x_phi[:, 1].min(), x_phi[:, 0].max(), x_phi[:, 1].max(), 0.01) 
         
 def test(args):
     assert args.output != None and args.load != None

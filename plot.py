@@ -12,10 +12,10 @@ def plot_decision_boundary(func, x_, t_, x_min, y_min, x_max, y_max, h):
     # Put the result into a color plot
     Z = Z.reshape(xx.shape)
     plt.figure(1, figsize=(4, 3))
-    plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Paired)
+    plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Set3, alpha=0.8)
 
     # Plot also the training points
-    plt.scatter(x_[:, 0], x_[:, 1], c=t_, edgecolors='k', cmap=plt.cm.Paired)
+    plt.scatter(x_[:, 0], x_[:, 1], c=t_, s=25, edgecolors='#666777', cmap=plt.cm.Set3)
     plt.xlabel('x1')
     plt.ylabel('x2')
 
@@ -25,7 +25,4 @@ def plot_decision_boundary(func, x_, t_, x_min, y_min, x_max, y_max, h):
     plt.yticks(())
 
     plt.show()
-
-if __name__ == '__main__':
-    plot_decision_boundary(None, 0, 0, 255, 255, 10)
 

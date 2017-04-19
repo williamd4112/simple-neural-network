@@ -263,5 +263,5 @@ class MultiLayerPerceptron(ClassificationModel):
         self._backward(sess, x_, t_)
         
         for l in xrange(L):
-            self.w[l] = self.w[l] - self.lr * self.layer_backward_derivatives[l]
+            self.w[l] = self.w[l] - self.lr * self.layer_backward_derivatives[l] / float(len(x_))
 

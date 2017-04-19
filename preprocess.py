@@ -8,6 +8,7 @@ from numpy import vstack,array
 from numpy.random import rand
 
 from sklearn import decomposition
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 import cPickle as pickle
 
@@ -19,6 +20,10 @@ class Preprocessor(object):
         return pca.transform(X), pca
        
     def lda(self, X, T, d):
+        clf = LinearDiscriminantAnalysis(n_components=d, solver='svd')
+        clf.fit(X, T.argmax(axis=1))
+        return clf.transform(X), clf
+
         N, M = X.shape
         K = T.shape[1]
         

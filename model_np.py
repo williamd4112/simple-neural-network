@@ -2,6 +2,8 @@ import numpy as np
 import logging
 import random
 
+import cPickle as pickle
+
 from model_util import *
 
 class ClassificationModel(object):
@@ -178,7 +180,15 @@ class MultiLayerPerceptron(ClassificationModel):
 
         # Backward derivative
         self.layer_backward_derivatives = [None] * (self.n_layers)
-    
+
+    def save(self, path):
+        pickle.dump(self.w, open(path + '.model', "wb"), True) 
+
+    def load(self, path):
+        self.w = pickle.load(open(path, "rb"))
+        self.n_classes = self.w[-1].shape[1]
+        self.n_features = self.w[0].shape[1]
+        
     def _get_activations(self, activations):
         acts = []
         for act in activations:
@@ -186,6 +196,8 @@ class MultiLayerPerceptron(ClassificationModel):
                 acts.append(Sigmoid())
             elif act == 'softmax':
                 acts.append(Softmax())
+            elif act == 'relu':
+                acts.append(ReLu())
             else:
                 raise NotImplementedError()
         acts = acts + [Softmax()]
@@ -201,7 +213,7 @@ class MultiLayerPerceptron(ClassificationModel):
         return self._forward(sess, x_)
 
     def _init_layer_weight(self, shape):
-        return np.random.normal(0.0, 1e-4, shape)
+        return np.random.normal(0, 1e-1, shape)
 
     def _init_weight(self):
         w = []

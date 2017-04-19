@@ -10,7 +10,3 @@ def one_hot(n, i):
     v[i] = 1
     return v
 
-if __name__ == '__main__':
-    import sys
-    X, Y = load_categorical_dataset(sys.argv[1], sys.argv[2])
-    print X.shape, Y.shape, Y[0]

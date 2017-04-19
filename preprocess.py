@@ -9,11 +9,14 @@ from numpy.random import rand
 
 from sklearn import decomposition
 
-class Preprocessor(object):
+import cPickle as pickle
+
+class Preprocessor(object):  
     def pca(self, X, k):
-        pca = decomposition.PCA(n_components=k)
+        pca = decomposition.PCA(n_components=k, whiten=True)
         pca.fit(X)
-        return pca.transform(X), pca.components_
+      
+        return pca.transform(X), pca
        
     def lda(self, X, T, d):
         N, M = X.shape

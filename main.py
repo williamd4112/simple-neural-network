@@ -8,27 +8,48 @@ from tqdm import *
 from util import one_hot
 from plot import plot_decision_boundary
 from preprocess import Preprocessor
-from model_np import ProbabilisticGenerativeModel, ProbabilisticDiscriminativeModel
+from model_np import ProbabilisticGenerativeModel, ProbabilisticDiscriminativeModel, MultiLayerPerceptron
+
+import cPickle as pickle
 
 def get_model(args):
     if args.model == 'gen':
         return ProbabilisticGenerativeModel()
-    else:
+    elif args.model == 'dis':
         return ProbabilisticDiscriminativeModel(lr=args.lr, 
                                                 epochs=args.epoch, 
                                                 batch_size=args.batch_size,
                                                 tolerance=args.tolerance)
+    elif args.model == 'nn':
+        n_hidden_units = [int(s) for s in args.h_d.split(',')]
+        logging.info('Create Multi-Layer Perceptron with (n_hidden_layer = %d, hidden_dims = %s, activations = %s)' % (args.h, args.h_d, args.activations))
+        return MultiLayerPerceptron(lr=args.lr, 
+                                    epochs=args.epoch, 
+                                    batch_size=args.batch_size,
+                                    tolerance=args.tolerance,
+                                    n_hidden_layers=args.h,
+                                    n_hidden_units=n_hidden_units,
+                                    hidden_activations=args.activations.split(','))
 
 def get_model_test(args):
     assert args.load != None
     if args.model == 'gen':
         model = ProbabilisticGenerativeModel()
-    else:
+    elif args.model == 'dis':
         model = ProbabilisticDiscriminativeModel(lr=None, 
                                                 epochs=None, 
                                                 batch_size=None,
                                                 tolerance=None)
-    
+    elif args.model == 'nn':
+        n_hidden_units = [int(s) for s in args.h_d.split(',')]
+        logging.info('Create Multi-Layer Perceptron with (n_hidden_layer = %d, hidden_dims = %s, activations = %s)' % (args.h, args.h_d, args.activations))
+        model = MultiLayerPerceptron(lr=args.lr, 
+                                    epochs=args.epoch, 
+                                    batch_size=args.batch_size,
+                                    tolerance=args.tolerance,
+                                    n_hidden_layers=args.h,
+                                    n_hidden_units=n_hidden_units,
+                                    hidden_activations=args.activations.split(','))
     model.load(args.load)
 
     return model
@@ -65,7 +86,7 @@ def preprocess(args, X, T):
 
 def preprocess_test(X, std, phi):
     X_normal = X / std
-    X_phi = X_normal.dot(phi.T)
+    X_phi = phi.transform(X_normal)
     bias = np.ones(len(X))[:, np.newaxis]
     X_phi = np.hstack((bias, X_phi))
     return X_phi
@@ -108,7 +129,7 @@ def plot(args):
         X_phi = np.hstack((bias, X))
         y = model.test(sess, X_phi)
         return y.argmax(axis=1)
-    plot_decision_boundary(func, x_phi, t_, x_phi[:, 0].min(), x_phi[:, 1].min(), x_phi[:, 0].max(), x_phi[:, 1].max(), 0.05) 
+    plot_decision_boundary(func, x_phi, t_, x_phi[:, 0].min(), x_phi[:, 1].min(), x_phi[:, 0].max(), x_phi[:, 1].max(), 0.01) 
         
 def test(args):
     assert args.output != None and args.load != None
@@ -234,14 +255,16 @@ def train(args):
             evaluate(args, model, X_phi, Y)
 
             logging.info('Save model to %s' % args.output)
-            if args.output == None:
-                output_path = '%s-model' % (args.model)
-            else:
-                output_path = args.output
+
+            assert args.output != None
+
+            output_path = args.output
             # Save model
             model.save(output_path)
+            
             # Save basis
-            np.save(output_path + '_basis', phi)
+            pickle.dump(phi, open(output_path + '.basis', "wb"), True) 
+
             # Save std
             np.save(output_path + '_std', std)
         
@@ -255,13 +278,16 @@ if __name__ == '__main__':
     parser.add_argument('--std', help='pre-trained model stddev path', type=str, default=None)
     parser.add_argument('--output', help='model output', type=str, default=None)
     parser.add_argument('--model', help='gen/dis model', 
-            choices=['gen', 'dis'], type=str, default='dis')
+            choices=['gen', 'dis', 'nn'], type=str, default='dis')
     parser.add_argument('--pre', help='gen/dis model', 
             choices=['pca', 'hist', 'lda'], type=str, default='pca')
     parser.add_argument('--permu', help='train/test task', 
             choices=['unbalance', 'balance'], type=str, default='unbalance')
     parser.add_argument('--d', help='pca dimension', type=int, default=2)
+    parser.add_argument('--h', help='number of nn hidden layers', type=int, default=1)
+    parser.add_argument('--h_d', help='number of node in nn hidden layer', type=str, default="32")
     parser.add_argument('--frac', help='fraction of training set', type=str, default='0.8')
+    parser.add_argument('--activations', help='activation functions', type=str, default='sigmoid')
     parser.add_argument('--tolerance', help='tolerance of error rate', type=float, default=0.01)
     parser.add_argument('--lr', help='learning rate', type=float, default=0.01)
     parser.add_argument('--epoch', help='epoch', type=int, default=20)

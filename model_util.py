@@ -10,6 +10,9 @@ def sigmoid(a):
 def d_sigmoid(a):
     return sigmoid(a) * (np.ones_like(a) - sigmoid(a)) 
 
+def relu(a):
+    return np.maximum(0, a)
+
 class DifferentiableFunction(object):
     def __call__(self, x):
         raise NotImplementedError()
@@ -27,3 +30,9 @@ class Softmax(DifferentiableFunction):
         return softmax(x)
     def d(self, x):
        return softmax(x) * (np.ones_like(x) - softmax(x))
+
+class ReLu(DifferentiableFunction):
+    def __call__(self, x):
+        return relu(x)
+    def d(self, x):
+        return (x > 0).astype(np.float32)

@@ -55,7 +55,6 @@ class ClassificationModel(object):
                 self._optimize(sess, x_train, t_train)
             acc = self.eval(sess, x_, t_)
             logging.info('Epoch %d Training accuracy = %f, error rate = %f' % (epoch, acc, 1.0 - acc))
-
             if 1.0 - acc <= tolerance:
                 logging.info('Target error rate reached.')
                 break
